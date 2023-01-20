@@ -14,14 +14,16 @@ Update the Vulkan-Loader, Vulkan-ValidationLayers, and Vulkan-Tools known-good f
 ### Recommended order for updating the repositories
 
 If the known-good of a repository needs to be updated, all repositories of interest that appear in its known-good files must be updated first using the procedure described in this wiki. See section [5. Update the Known Good Files](https://github.com/KhronosGroup/Vulkan-Headers/wiki/Integrating-Updated-Vulkan-Headers-into-Vulkan-Repositories/#5-update-the-known-good-files) for a list of dependencies per repository. The following list indicates the preferred known-good update order:
+
 1. Vulkan-Loader
 1. Vulkan-ValidationLayers
 3. Vulkan-Tools
 4. LunarG repositories when applicable
 
 **Notes**:
-* Typically the Vulkan-Loader's known-good is updated first, but the Vulkan-ValidationLayers known-good can also be updated first.
-* The Vulkan-ValidationLayers GitHub CI currently contains a dependency on LunarG-VulkanTools. Occasionally Vulkan-Header updates require changes to be made to LunarG-VulkanTools before updating Vulkan-ValidationLayers known-good files (see the [update LunarG known-good section](https://github.com/KhronosGroup/Vulkan-Headers/wiki/Integrating-Vulkan-Header-Updates-into-Vulkan-Repositories#update-the-lunargvulkantools-and-lunargvulkansamples-known-good-files) below for more information).
+
+- Typically the Vulkan-Loader's known-good is updated first, but the Vulkan-ValidationLayers known-good can also be updated first.
+- The Vulkan-ValidationLayers GitHub CI currently contains a dependency on LunarG-VulkanTools. Occasionally Vulkan-Header updates require changes to be made to LunarG-VulkanTools before updating Vulkan-ValidationLayers known-good files (see the [update LunarG known-good section](https://github.com/KhronosGroup/Vulkan-Headers/wiki/Integrating-Vulkan-Header-Updates-into-Vulkan-Repositories#update-the-lunargvulkantools-and-lunargvulkansamples-known-good-files) below for more information).
 
 ### 1. Checkout and pull the `master` branch
 
@@ -30,6 +32,7 @@ Navigate to the directory of the project of interest and checkout the `master` b
 ### 2. Generate new source files using `scripts/generate_source.py`
 
 Using your favorite command prompt, navigate to the `scripts` directory and run the `generate_source.py` script. This script requires the specification of the location of the `Vulkan-Headers/registry` directory on the system. An example of how to run this script:
+
 ```
 ./generate_source.py ../../Vulkan-Headers/registry/
 ```
@@ -41,9 +44,11 @@ All Khronos repositories and LunarG/VulkanTools contain a flavor of Vulkan-Heade
 #### 2-2. Vulkan-ValidationLayers sub-step: check for VUID inconsistencies
 
 In Vulkan-ValidationLayers, every time the `generate_source.py` script is run a new VUID database is generated. When VUIDs are added, removed, or modified consistency testing must be performed. The `vk_validation_stats.py` script found in the ValidationLayers `scripts` directory can be used to report consistency warnings using the `-c` option.
+
 ```
 ./vk_validation_stats.py ../../Vulkan-Headers/registry/validusage.json -c
 ```
+
 All consistency warnings must be resolved and included in the pull request for the repository's known-good update.
 
 ### 3. Build the project
@@ -52,21 +57,21 @@ Build the project, referring to the `BUILD.md` file in the directory if necessar
 
 ### 4. Test the build
 
-  - To test the Vulkan-Loader build, run the loader tests (`run_all_tests.sh`) found in the `build/tests` directory. Information on how to build and run the tests can be found in the [Vulkan-Loader `BUILD.md`](https://github.com/KhronosGroup/Vulkan-Loader/blob/master/BUILD.md) file. **Note**: The `VK_LAYER_PATH` environment variable must be set to point at the layers found in `Vulkan-Loader/build/tests/layers` when running the loader tests.
+- To test the Vulkan-Loader build, run the loader tests (`run_all_tests.sh`) found in the `build/tests` directory. Information on how to build and run the tests can be found in the [Vulkan-Loader `BUILD.md`](https://github.com/KhronosGroup/Vulkan-Loader/blob/master/BUILD.md) file. **Note**: The `VK_LAYER_PATH` environment variable must be set to point at the layers found in `Vulkan-Loader/build/tests/layers` when running the loader tests.
   
-  - To test the Vulkan-ValidationLayers build, run the validation layers tests (`vk_layer_validation_tests`) found in the `build/tests` directory. Information on how to build and run the tests can be found in the [Vulkan-ValidationLayers `BUILD.md`](https://github.com/KhronosGroup/Vulkan-ValidationLayers/blob/master/BUILD.md) file.
+- To test the Vulkan-ValidationLayers build, run the validation layers tests (`vk_layer_validation_tests`) found in the `build/tests` directory. Information on how to build and run the tests can be found in the [Vulkan-ValidationLayers `BUILD.md`](https://github.com/KhronosGroup/Vulkan-ValidationLayers/blob/master/BUILD.md) file.
   
-  - To test the Vulkan-Tools build, run `vkcube` and verify `vulkaninfo` produces reasonable output. More information on how to use `vulkaninfo` can be found [here](https://github.com/KhronosGroup/Vulkan-Tools/blob/master/vulkaninfo/vulkaninfo.md).
+- To test the Vulkan-Tools build, run `vkcube` and verify `vulkaninfo` produces reasonable output. More information on how to use `vulkaninfo` can be found [here](https://github.com/KhronosGroup/Vulkan-Tools/blob/master/vulkaninfo/vulkaninfo.md).
 
 ### 5. Update the known-good files
 
 Every repository contains a `scripts/known_good.json` file which contains information about the known good commits for each dependent repository. Some repositories require an additional known-good file to be updated for Android builds and are specified below. Known-good updates require updating only the "commit" values of the relevant JSON objects. Using an existing tag for this value is preferred over using a full commit id. If a tag does not exist, typically the most recent commit on `master` is chosen for updating the known good. **Note**: Do not change commit values for repositories not listed below unless an update is absolutely required.
 
-  - Vulkan-Loader: Update requires specifying a new `Vulkan-Headers` commit in `scripts/known_good.json`
+- Vulkan-Loader: Update requires specifying a new `Vulkan-Headers` commit in `scripts/known_good.json`
 
-  - Vulkan-ValidationLayers: Update requires specifying a new `Vulkan-Headers` commit in `scripts/known_good.json`. Additionally, new `Vulkan-Headers` and `Vulkan-Tools` commits must be specified in the `build-android/known_good.json` file.
+- Vulkan-ValidationLayers: Update requires specifying a new `Vulkan-Headers` commit in `scripts/known_good.json`. Additionally, new `Vulkan-Headers` and `Vulkan-Tools` commits must be specified in the `build-android/known_good.json` file.
 
-  - Vulkan-Tools: Update requires specifying new `Vulkan-Headers` and `Vulkan-Loader` commits in `scripts/known_good.json`. Additionally, a new `Vulkan-Headers` commit must be specified in the `vulkan-headers_revision_android` file.
+- Vulkan-Tools: Update requires specifying new `Vulkan-Headers` and `Vulkan-Loader` commits in `scripts/known_good.json`. Additionally, a new `Vulkan-Headers` commit must be specified in the `vulkan-headers_revision_android` file.
 
 ### 6. Commit changes
 
@@ -90,8 +95,8 @@ Updating the Known-good files in LunarG repositories follows the same steps as u
 
 ### Testing LunarG builds
 
-  - LunarG/VulkanTools: Build Debug and Release on Linux and Windows. Verify vktrace/replay works. Verify several of the layers built in this repo work.
-  - LunarG/VulkanSamples: Build all and run a few of the Vulkan Samples. Instructions on how to build and run the LunarG Vulkan samples can be found in the repository's [`BUILD.md` file](https://github.com/LunarG/VulkanSamples/blob/master/BUILD.md).
+- LunarG/VulkanTools: Build Debug and Release on Linux and Windows. Verify vktrace/replay works. Verify several of the layers built in this repo work.
+- LunarG/VulkanSamples: Build all and run a few of the Vulkan Samples. Instructions on how to build and run the LunarG Vulkan samples can be found in the repository's [`BUILD.md` file](https://github.com/LunarG/VulkanSamples/blob/master/BUILD.md).
 
 ### Updating LunarG known-good files
 
